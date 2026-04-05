@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sweetwater Court — Now Serving</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@500&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --ink:#1A1A18;--charcoal:#2C2C2A;
+  --cream:#FDF8EF;--warm:#FFFCF5;
+  --lemon:#F5C842;--lemon-dark:#C8971F;--lemon-pale:#FEF9E8;
+  --sage:#7B9E87;--sage-light:#E8F0EA;--sage-dark:#4A6B54;
+  --border:#E8E3D8;--muted:#888780;
+  --font-display:'Playfair Display',serif;
+  --font-body:'DM Sans',sans-serif;
+  --font-mono:'DM Mono',monospace;
+}
+html,body{height:100%;background:var(--cream);overflow:hidden}
+body{font-family:var(--font-body);color:var(--ink);display:flex;flex-direction:column}
+
+/* HEADER */
+.header{background:var(--ink);padding:0 3rem;height:80px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.brand{display:flex;flex-direction:column}
+.brand-name{font-family:var(--font-display);color:var(--lemon);font-size:1.8rem;letter-spacing:0.04em;line-height:1}
+.brand-tag{font-size:11px;color:#888;letter-spacing:0.12em;text-transform:uppercase;margin-top:4px}
+.header-center{text-align:center}
+.header-label{font-size:11px;color:#666;letter-spacing:0.14em;text-transform:uppercase;margin-bottom:4px}
+.header-sub{font-size:13px;color:#888}
+.header-right{text-align:right}
+.clock{font-family:var(--font-mono);font-size:1.3rem;color:var(--lemon)}
+.date-str{font-size:12px;color:#777;margin-top:4px}
+
+/* MAIN LAYOUT */
+.main{flex:1;display:grid;grid-template-columns:1fr 1fr;gap:0;overflow:hidden}
+
+/* NOW SERVING PANEL */
+.serving-panel{background:var(--ink);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:3rem;border-right:none;position:relative;overflow:hidden}
+.serving-panel::before{content:'✦';position:absolute;font-size:30rem;color:#222;top:50%;left:50%;transform:translate(-50%,-50%);font-family:var(--font-display);line-height:1;pointer-events:none}
+.serving-content{position:relative;z-index:1;text-align:center}
+.now-label{font-size:12px;font-weight:500;letter-spacing:0.2em;text-transform:uppercase;color:#666;margin-bottom:1rem}
+.ticket-display{position:relative}
+.ticket-number{font-family:var(--font-display);font-size:clamp(5rem,12vw,10rem);color:var(--lemon);font-weight:700;line-height:1;animation:ticketIn 0.5s cubic-bezier(0.175,0.885,0.32,1.275)}
+@keyframes ticketIn{from{opacity:0;transform:scale(0.7) translateY(20px)}to{opacity:1;transform:scale(1) translateY(0)}}
+.ticket-number.flash{animation:flashIn 0.6s ease}
+@keyframes flashIn{0%{color:var(--lemon);transform:scale(1.2)}30%{color:#fff;transform:scale(1.1)}100%{color:var(--lemon);transform:scale(1)}}
+.ready-text{font-family:var(--font-display);font-size:1.2rem;color:#666;font-style:italic;margin-top:0.5rem}
+.pickup-note{margin-top:1.5rem;font-size:13px;color:#555;letter-spacing:0.04em}
+
+.serving-divider{width:60px;height:1px;background:var(--lemon-dark);margin:2rem auto;opacity:0.4}
+
+/* RECENT TICKETS */
+.recent-label{font-size:10px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#555;margin-bottom:12px;text-align:center}
+.recent-tickets{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;max-width:300px}
+.recent-pill{font-family:var(--font-mono);font-size:13px;font-weight:500;padding:6px 16px;border-radius:20px;color:#888;background:#222;border:1px solid #333;transition:all 0.3s}
+.recent-pill.latest{color:var(--lemon);background:#2A2510;border-color:var(--lemon-dark)}
+
+/* QUEUE PANEL */
+.queue-panel{background:var(--warm);display:flex;flex-direction:column;overflow:hidden}
+.queue-header{padding:1.5rem 2rem;border-bottom:1px solid var(--border)}
+.queue-header h2{font-family:var(--font-display);font-size:1.3rem;color:var(--ink)}
+.queue-header p{font-size:13px;color:var(--muted);margin-top:2px}
+
+.queue-list{flex:1;overflow-y:auto;padding:1.5rem 2rem}
+.queue-list::-webkit-scrollbar{width:4px}
+.queue-list::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
+
+.queue-item{display:flex;align-items:center;gap:1rem;padding:14px;border-radius:12px;margin-bottom:10px;border:1px solid var(--border);background:var(--cream);transition:all 0.3s;animation:queueIn 0.3s ease}
+@keyframes queueIn{from{opacity:0;transform:translateX(10px)}to{opacity:1;transform:translateX(0)}}
+.queue-item.status-new{border-left:3px solid var(--lemon-dark)}
+.queue-item.status-progress{border-left:3px solid #6BAED6;background:var(--warm)}
+.queue-item.status-ready{border-left:3px solid var(--sage);background:var(--sage-light);animation:readyGlow 1s ease}
+@keyframes readyGlow{0%{box-shadow:0 0 0 0 rgba(123,158,135,0.4)}100%{box-shadow:0 0 0 8px rgba(123,158,135,0)}}
+.qi-num{font-family:var(--font-mono);font-size:1rem;font-weight:500;color:var(--ink);min-width:44px}
+.qi-status{flex-shrink:0}
+.status-dot{width:10px;height:10px;border-radius:50%;display:inline-block}
+.dot-new{background:var(--lemon-dark)}
+.dot-progress{background:#6BAED6}
+.dot-ready{background:var(--sage);box-shadow:0 0 0 4px rgba(123,158,135,0.3)}
+.qi-info{flex:1}
+.qi-label{font-size:13px;font-weight:500;color:var(--ink)}
+.qi-sub{font-size:11px;color:var(--muted);margin-top:1px}
+.qi-time{font-size:11px;color:var(--muted);font-family:var(--font-mono)}
+
+.queue-empty{text-align:center;padding:4rem 1rem;color:var(--muted)}
+.queue-empty-icon{font-size:3rem;display:block;margin-bottom:12px;opacity:0.3}
+.queue-empty h3{font-family:var(--font-display);font-weight:400;font-size:1.1rem;margin-bottom:4px}
+.queue-empty p{font-size:13px}
+
+/* STATUS LEGEND */
+.legend{padding:1rem 2rem;border-top:1px solid var(--border);background:var(--cream);display:flex;gap:1.5rem;flex-shrink:0}
+.legend-item{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--muted)}
+.legend-dot{width:8px;height:8px;border-radius:50%}
+
+/* MARQUEE / TICKER */
+.ticker{background:var(--lemon);height:36px;display:flex;align-items:center;overflow:hidden;flex-shrink:0}
+.ticker-inner{display:flex;align-items:center;animation:ticker 30s linear infinite;white-space:nowrap}
+.ticker-inner:hover{animation-play-state:paused}
+@keyframes ticker{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+.ticker-msg{font-size:12px;font-weight:500;color:var(--ink);letter-spacing:0.05em;padding:0 3rem}
+.ticker-dot{color:var(--lemon-dark);margin:0 1rem}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="brand">
+    <div class="brand-name">✦ Sweetwater Court</div>
+    <div class="brand-tag">Artisan Lemonades & Sodas</div>
+  </div>
+  <div class="header-center">
+    <div class="header-label">Order Status Board</div>
+    <div class="header-sub">Listen for your number or watch below</div>
+  </div>
+  <div class="header-right">
+    <div class="clock" id="clock"></div>
+    <div class="date-str" id="dateStr"></div>
+  </div>
+</div>
+
+<div class="ticker">
+  <div class="ticker-inner" id="tickerInner">
+    <span class="ticker-msg">Welcome to Sweetwater Court</span>
+    <span class="ticker-dot">✦</span>
+    <span class="ticker-msg">All drinks made fresh to order with real ingredients</span>
+    <span class="ticker-dot">✦</span>
+    <span class="ticker-msg">Please have your ticket number ready</span>
+    <span class="ticker-dot">✦</span>
+    <span class="ticker-msg">Ask about today's seasonal specials</span>
+    <span class="ticker-dot">✦</span>
+    <span class="ticker-msg">Welcome to Sweetwater Court</span>
+    <span class="ticker-dot">✦</span>
+    <span class="ticker-msg">All drinks made fresh to order with real ingredients</span>
+    <span class="ticker-dot">✦</span>
+    <span class="ticker-msg">Please have your ticket number ready</span>
+    <span class="ticker-dot">✦</span>
+    <span class="ticker-msg">Ask about today's seasonal specials</span>
+    <span class="ticker-dot">✦</span>
+  </div>
+</div>
+
+<div class="main">
+  <!-- NOW SERVING -->
+  <div class="serving-panel">
+    <div class="serving-content">
+      <div class="now-label">Now Serving</div>
+      <div class="ticket-display">
+        <div class="ticket-number" id="bigTicket">—</div>
+      </div>
+      <div class="ready-text">Your order is ready!</div>
+      <div class="pickup-note">Please pick up at the counter</div>
+
+      <div class="serving-divider"></div>
+
+      <div class="recent-label">Recently Called</div>
+      <div class="recent-tickets" id="recentTickets">
+        <span style="font-size:12px;color:#555">Waiting for orders...</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- QUEUE -->
+  <div class="queue-panel">
+    <div class="queue-header">
+      <h2>Order Queue</h2>
+      <p>Estimated wait: 3–6 minutes per order</p>
+    </div>
+    <div class="queue-list" id="queueList"></div>
+    <div class="legend">
+      <div class="legend-item"><div class="legend-dot" style="background:var(--lemon-dark)"></div><span>Received</span></div>
+      <div class="legend-item"><div class="legend-dot" style="background:#6BAED6"></div><span>Being made</span></div>
+      <div class="legend-item"><div class="legend-dot" style="background:var(--sage)"></div><span>Ready!</span></div>
+    </div>
+  </div>
+</div>
+
+<script>
+let lastServing = null;
+let servedHistory = JSON.parse(localStorage.getItem('sw_done_tickets') || '[]');
+
+function timeAgo(ms) {
+  const s = Math.floor((Date.now() - ms) / 1000);
+  if (s < 60) return s + 's ago';
+  const m = Math.floor(s / 60);
+  return m + 'm ago';
+}
+
+function statusLabel(s) {
+  if (s === 'new') return 'Order received';
+  if (s === 'progress') return 'Being made now';
+  if (s === 'ready') return 'Ready for pickup!';
+  return s;
+}
+
+function renderBoard() {
+  const orders = JSON.parse(localStorage.getItem('sw_orders') || '[]');
+  const serving = JSON.parse(localStorage.getItem('sw_serving') || '[]');
+  const lastReady = localStorage.getItem('sw_last_ready');
+
+  // Now Serving
+  const bigEl = document.getElementById('bigTicket');
+  if (lastReady && lastReady !== lastServing) {
+    bigEl.textContent = lastReady;
+    bigEl.classList.remove('flash');
+    void bigEl.offsetWidth; // reflow to restart animation
+    bigEl.classList.add('flash');
+    lastServing = lastReady;
+  } else if (!lastReady) {
+    bigEl.textContent = '—';
+  }
+
+  // Recent tickets
+  const recent = document.getElementById('recentTickets');
+  const history = JSON.parse(localStorage.getItem('sw_done_tickets') || '[]');
+  if (history.length) {
+    recent.innerHTML = '';
+    history.slice(-6).reverse().forEach((d, i) => {
+      const p = document.createElement('span');
+      p.className = 'recent-pill' + (i === 0 ? ' latest' : '');
+      p.textContent = d.num;
+      recent.appendChild(p);
+    });
+  }
+
+  // Queue
+  const list = document.getElementById('queueList');
+  // Reconstruct orders with statuses from staff view
+  const staffOrders = JSON.parse(localStorage.getItem('sw_orders') || '[]');
+
+  if (!staffOrders.length) {
+    list.innerHTML = `<div class="queue-empty"><span class="queue-empty-icon">🍋</span><h3>All quiet for now</h3><p>New orders will appear here</p></div>`;
+    return;
+  }
+
+  list.innerHTML = '';
+  // Sort: ready first, then progress, then new; within each by time
+  const sorted = [...staffOrders].sort((a, b) => {
+    const order = { ready: 0, progress: 1, new: 2 };
+    if (order[a.status] !== order[b.status]) return order[a.status] - order[b.status];
+    return a.time - b.time;
+  });
+
+  sorted.forEach(order => {
+    const d = document.createElement('div');
+    d.className = 'queue-item status-' + (order.status || 'new');
+    const dotClass = { new: 'dot-new', progress: 'dot-progress', ready: 'dot-ready' }[order.status] || 'dot-new';
+    const itemCount = order.items ? order.items.reduce((s, i) => s + (i.qty || 1), 0) : 1;
+    d.innerHTML = `
+      <div class="qi-num">${order.ticketNum}</div>
+      <div class="qi-status"><span class="status-dot ${dotClass}"></span></div>
+      <div class="qi-info">
+        <div class="qi-label">${statusLabel(order.status || 'new')}</div>
+        <div class="qi-sub">${itemCount} item${itemCount !== 1 ? 's' : ''}</div>
+      </div>
+      <div class="qi-time">${timeAgo(order.time)}</div>
+    `;
+    list.appendChild(d);
+  });
+}
+
+function updateClock() {
+  const now = new Date();
+  document.getElementById('clock').textContent = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+  document.getElementById('dateStr').textContent = now.toLocaleDateString([], { weekday: 'long', month: 'long', day: 'numeric' });
+}
+
+// Listen for localStorage changes (cross-tab communication)
+window.addEventListener('storage', (e) => {
+  if (['sw_orders', 'sw_serving', 'sw_last_ready', 'sw_done_tickets'].includes(e.key)) {
+    renderBoard();
+  }
+});
+
+setInterval(updateClock, 1000);
+setInterval(renderBoard, 3000);
+updateClock();
+renderBoard();
+</script>
+</body>
+</html>

@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sweetwater Court — Staff Display</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#111110;--surface:#1A1A18;--surface2:#222220;--surface3:#2A2A28;
+  --border:#333330;--border2:#3A3A38;
+  --lemon:#F5C842;--lemon-dim:#8A7020;
+  --sage:#7B9E87;--sage-dim:#3A5040;
+  --danger:#D85A30;--danger-dim:#4A2010;
+  --green:#5BAF72;--green-dim:#1F3D28;
+  --text:#E8E3D8;--text2:#888780;--text3:#555550;
+  --font-display:'Playfair Display',serif;
+  --font-body:'DM Sans',sans-serif;
+  --font-mono:'DM Mono',monospace;
+}
+html,body{height:100%;overflow:hidden;background:var(--bg)}
+body{font-family:var(--font-body);color:var(--text);display:flex;flex-direction:column}
+
+/* TOPBAR */
+.topbar{background:#0A0A09;border-bottom:1px solid var(--border);padding:0 1.5rem;height:60px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.brand{display:flex;align-items:center;gap:10px}
+.brand-dot{width:8px;height:8px;background:var(--green);border-radius:50%;animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}
+.brand-name{font-family:var(--font-display);color:var(--lemon);font-size:1.1rem}
+.brand-sub{font-size:10px;color:var(--text3);letter-spacing:0.1em;text-transform:uppercase;margin-left:2px}
+.stats-bar{display:flex;gap:2px}
+.stat-chip{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:6px 16px;text-align:center;min-width:80px}
+.stat-n{font-size:1.3rem;font-weight:500;font-variant-numeric:tabular-nums;line-height:1}
+.stat-n.yellow{color:var(--lemon)}
+.stat-n.blue{color:#6BAED6}
+.stat-n.green{color:var(--green)}
+.stat-n.white{color:var(--text)}
+.stat-l{font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:0.1em;margin-top:2px}
+.topbar-right{display:flex;align-items:center;gap:1rem}
+.clock-display{font-family:var(--font-mono);font-size:1.1rem;color:var(--text2)}
+.refresh-note{font-size:10px;color:var(--text3)}
+
+/* BOARD */
+.board{flex:1;display:grid;grid-template-columns:1fr 1fr 1fr;gap:1px;background:var(--border);overflow:hidden}
+.col{background:var(--bg);display:flex;flex-direction:column;overflow:hidden}
+.col-header{padding:14px 1.25rem 10px;border-bottom:1px solid var(--border);flex-shrink:0;display:flex;align-items:center;justify-content:space-between}
+.col-title{font-size:10px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:var(--text3)}
+.col-badge{font-size:11px;font-weight:500;padding:2px 10px;border-radius:20px;font-family:var(--font-mono)}
+.badge-new{background:#2A2010;color:var(--lemon)}
+.badge-prog{background:#1A2030;color:#6BAED6}
+.badge-ready{background:var(--green-dim);color:var(--green)}
+.col-body{flex:1;overflow-y:auto;padding:10px}
+.col-body::-webkit-scrollbar{width:4px}
+.col-body::-webkit-scrollbar-track{background:transparent}
+.col-body::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
+
+/* TICKETS */
+.ticket{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:10px;transition:all 0.25s;animation:slideDown 0.3s ease}
+@keyframes slideDown{from{opacity:0;transform:translateY(-10px)}to{opacity:1;transform:translateY(0)}}
+.ticket:last-child{margin-bottom:0}
+.ticket.urgent{border-color:var(--danger);background:#1A1410}
+.ticket.critical{border-color:var(--danger);background:#1A1410;animation:urgentPulse 1.5s infinite}
+@keyframes urgentPulse{0%,100%{box-shadow:0 0 0 0 rgba(216,90,48,0)}50%{box-shadow:0 0 0 4px rgba(216,90,48,0.2)}}
+
+.t-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.t-num{font-family:var(--font-display);font-size:1.2rem;color:var(--lemon);font-weight:700}
+.t-time{font-family:var(--font-mono);font-size:11px;padding:3px 9px;border-radius:20px;font-weight:500}
+.time-fresh{background:#1A2A18;color:#7ecb8f}
+.time-mid{background:#2A2510;color:var(--lemon)}
+.time-warn{background:#2A1A10;color:#E8956A}
+.time-crit{background:var(--danger-dim);color:#F0907A}
+.t-items{list-style:none;margin-bottom:12px}
+.t-items li{font-size:13px;color:#CCC8C0;padding:4px 0;border-bottom:1px solid var(--border);display:flex;flex-direction:column;gap:2px}
+.t-items li:last-child{border-bottom:none}
+.li-main{display:flex;align-items:center;gap:6px}
+.li-qty{background:var(--surface3);border-radius:4px;padding:1px 6px;font-size:11px;font-weight:500;font-family:var(--font-mono);color:var(--lemon)}
+.li-mods{font-size:11px;color:var(--sage);padding-left:4px;line-height:1.5}
+.t-actions{display:flex;gap:6px}
+.t-btn{flex:1;border:none;border-radius:8px;padding:9px 8px;font-family:var(--font-body);font-size:12px;font-weight:500;cursor:pointer;transition:all 0.18s;letter-spacing:0.02em}
+.t-btn:hover{filter:brightness(1.15);transform:translateY(-1px)}
+.t-btn:active{transform:translateY(0)}
+.btn-start{background:#1A2A20;color:#7ecb8f;border:1px solid var(--sage-dim)}
+.btn-start:hover{background:#253d2d}
+.btn-ready{background:var(--green-dim);color:var(--green);border:1px solid #2d5a38}
+.btn-ready:hover{background:#253d28}
+.btn-complete{background:#1A2A20;color:#7ecb8f;border:1px solid #2d5a38}
+.btn-complete:hover{background:#253d2d}
+.btn-back{background:var(--surface2);color:var(--text2);border:1px solid var(--border);flex:0 0 36px;display:flex;align-items:center;justify-content:center;font-size:14px;padding:9px 0}
+.btn-cancel{background:var(--danger-dim);color:#E8907A;border:1px solid #4A2A18;flex:0 0 36px;display:flex;align-items:center;justify-content:center;font-size:14px;padding:9px 0}
+.t-alert{font-size:11px;color:var(--danger);margin-top:8px;display:flex;align-items:center;gap:4px;font-weight:500}
+
+/* EMPTY STATES */
+.empty-state{text-align:center;padding:3rem 1rem;color:var(--text3)}
+.empty-icon{font-size:2.5rem;opacity:0.3;margin-bottom:8px}
+.empty-state p{font-size:13px}
+
+/* FOOTER */
+.footer{background:#0A0A09;border-top:1px solid var(--border);padding:8px 1.5rem;display:flex;align-items:center;gap:8px;flex-shrink:0;overflow-x:auto}
+.footer-label{font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:0.1em;white-space:nowrap;flex-shrink:0}
+.done-pill{background:#1A2A18;color:#5BAF72;border:1px solid #2A3A28;font-size:11px;font-weight:500;padding:4px 12px;border-radius:20px;white-space:nowrap;flex-shrink:0;font-family:var(--font-mono)}
+.footer-spacer{flex:1}
+
+/* CONFIRM MODAL */
+.confirm-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.8);z-index:200;align-items:center;justify-content:center}
+.confirm-overlay.open{display:flex}
+.confirm-box{background:var(--surface);border:1px solid var(--border2);border-radius:14px;padding:1.5rem;width:300px;text-align:center}
+.confirm-box h3{font-family:var(--font-display);color:var(--text);margin-bottom:8px}
+.confirm-box p{font-size:13px;color:var(--text2);margin-bottom:1.5rem}
+.confirm-actions{display:flex;gap:8px}
+.confirm-yes{flex:1;background:var(--danger-dim);color:#E8907A;border:1px solid #5A2A18;border-radius:8px;padding:10px;font-family:var(--font-body);font-size:13px;cursor:pointer}
+.confirm-no{flex:1;background:var(--surface2);color:var(--text2);border:1px solid var(--border);border-radius:8px;padding:10px;font-family:var(--font-body);font-size:13px;cursor:pointer}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="brand">
+    <div class="brand-dot"></div>
+    <div>
+      <div class="brand-name">Sweetwater Court</div>
+      <div class="brand-sub">Kitchen Display</div>
+    </div>
+  </div>
+  <div class="stats-bar">
+    <div class="stat-chip"><div class="stat-n yellow" id="sNew">0</div><div class="stat-l">New</div></div>
+    <div class="stat-chip"><div class="stat-n blue" id="sMaking">0</div><div class="stat-l">Making</div></div>
+    <div class="stat-chip"><div class="stat-n green" id="sReady">0</div><div class="stat-l">Ready</div></div>
+    <div class="stat-chip"><div class="stat-n white" id="sDone">0</div><div class="stat-l">Done</div></div>
+  </div>
+  <div class="topbar-right">
+    <div class="refresh-note">Auto-refresh every 5s</div>
+    <div class="clock-display" id="clock"></div>
+  </div>
+</div>
+
+<div class="board">
+  <div class="col">
+    <div class="col-header"><span class="col-title">New Orders</span><span class="col-badge badge-new" id="bNew">0</span></div>
+    <div class="col-body" id="colNew"></div>
+  </div>
+  <div class="col">
+    <div class="col-header"><span class="col-title">In Progress</span><span class="col-badge badge-prog" id="bProg">0</span></div>
+    <div class="col-body" id="colProg"></div>
+  </div>
+  <div class="col">
+    <div class="col-header"><span class="col-title">Ready for Pickup</span><span class="col-badge badge-ready" id="bReady">0</span></div>
+    <div class="col-body" id="colReady"></div>
+  </div>
+</div>
+
+<div class="footer">
+  <span class="footer-label">Completed Today</span>
+  <div id="doneRow"></div>
+  <div class="footer-spacer"></div>
+</div>
+
+<div class="confirm-overlay" id="confirmOverlay">
+  <div class="confirm-box">
+    <h3>Cancel Order?</h3>
+    <p>This will remove the order from the queue. This cannot be undone.</p>
+    <div class="confirm-actions">
+      <button class="confirm-yes" id="confirmYes">Cancel Order</button>
+      <button class="confirm-no" onclick="closeConfirm()">Keep It</button>
+    </div>
+  </div>
+</div>
+
+<script>
+let orders = JSON.parse(localStorage.getItem('sw_orders') || '[]');
+let doneCount = parseInt(localStorage.getItem('sw_done') || '0');
+let doneTickets = JSON.parse(localStorage.getItem('sw_done_tickets') || '[]');
+let pendingCancel = null;
+
+// Demo orders if empty
+if (!orders.length) {
+  const now = Date.now();
+  orders = [
+    {ticketNum:'#101',items:[{name:'Lavender Honey',emoji:'💜',qty:1,labels:['50%','Light ice']},{name:'Classic Sweetwater',emoji:'🍋',qty:2,labels:[]}],status:'new',time:now-180000},
+    {ticketNum:'#102',items:[{name:'Peach Cardamom',emoji:'🍑',qty:1,labels:['No Sugar','Extra ice','Large 24oz']},{name:'Blood Orange Tonic',emoji:'🧡',qty:1,labels:[]}],status:'new',time:now-60000},
+    {ticketNum:'#103',items:[{name:'Spicy Jalapeño',emoji:'🌶️',qty:1,labels:['100% (Full)','Salted Rim']}],status:'progress',time:now-120000},
+    {ticketNum:'#104',items:[{name:'Hibiscus Rose',emoji:'🌺',qty:2,labels:['75%']},{name:'Ginger Citrus Fizz',emoji:'🫚',qty:1,labels:[]}],status:'ready',time:now-240000},
+  ];
+  saveOrders();
+}
+
+function saveOrders(){localStorage.setItem('sw_orders',JSON.stringify(orders))}
+function saveAll(){saveOrders();localStorage.setItem('sw_done',doneCount);localStorage.setItem('sw_done_tickets',JSON.stringify(doneTickets))}
+
+function ageStr(ms){const s=Math.floor(ms/1000),m=Math.floor(s/60);return m>0?m+'m '+(s%60)+'s':s+'s'}
+function ageClass(ms){const s=ms/1000;if(s<90)return'time-fresh';if(s<180)return'time-mid';if(s<300)return'time-warn';return'time-crit'}
+
+function renderBoard(){
+  // Re-read from localStorage in case kiosk sent new orders
+  const stored=JSON.parse(localStorage.getItem('sw_orders')||'[]');
+  // Merge: keep staff status updates, add new orders from kiosk
+  stored.forEach(so=>{
+    const ex=orders.find(o=>o.ticketNum===so.ticketNum);
+    if(!ex)orders.push({...so,status:'new'});
+  });
+  // Remove any that were cancelled
+  orders=orders.filter(o=>stored.some(s=>s.ticketNum===o.ticketNum)||o.status==='new'||o.status==='progress'||o.status==='ready');
+  saveOrders();
+
+  const newOrds=orders.filter(o=>o.status==='new');
+  const progOrds=orders.filter(o=>o.status==='progress');
+  const readyOrds=orders.filter(o=>o.status==='ready');
+
+  document.getElementById('sNew').textContent=newOrds.length;
+  document.getElementById('sMaking').textContent=progOrds.length;
+  document.getElementById('sReady').textContent=readyOrds.length;
+  document.getElementById('sDone').textContent=doneCount;
+  document.getElementById('bNew').textContent=newOrds.length;
+  document.getElementById('bProg').textContent=progOrds.length;
+  document.getElementById('bReady').textContent=readyOrds.length;
+
+  renderCol('colNew',newOrds,'new');
+  renderCol('colProg',progOrds,'progress');
+  renderCol('colReady',readyOrds,'ready');
+  renderDone();
+}
+
+function renderCol(colId,ords,status){
+  const col=document.getElementById(colId);
+  if(!ords.length){
+    col.innerHTML=`<div class="empty-state"><div class="empty-icon">${status==='new'?'⏳':status==='progress'?'⚗️':'✅'}</div><p>Nothing here</p></div>`;
+    return;
+  }
+  col.innerHTML='';
+  ords.forEach(order=>{
+    const age=Date.now()-order.time;
+    const isUrgent=age>300000,isCrit=age>480000;
+    const t=document.createElement('div');
+    t.className='ticket'+(isCrit?' critical':isUrgent?' urgent':'');
+    const itemsHTML=order.items.map(it=>`<li><div class="li-main"><span class="li-qty">${it.qty}x</span><span>${it.emoji} ${it.name}</span></div>${it.labels&&it.labels.length?`<span class="li-mods">${it.labels.join(' · ')}</span>`:''}</li>`).join('');
+    let actions='';
+    if(status==='new')actions=`<button class="t-btn btn-start" onclick="bump('${order.ticketNum}','progress')">▶ Start Making</button><button class="t-btn btn-cancel" onclick="askCancel('${order.ticketNum}')" title="Cancel">✕</button>`;
+    if(status==='progress')actions=`<button class="t-btn btn-ready" onclick="bump('${order.ticketNum}','ready')">✓ Mark Ready</button><button class="t-btn btn-back" onclick="bump('${order.ticketNum}','new')" title="Move back">↩</button>`;
+    if(status==='ready')actions=`<button class="t-btn btn-complete" onclick="bump('${order.ticketNum}','done')" style="flex:1">✓ Complete & Clear</button>`;
+    t.innerHTML=`<div class="t-head"><span class="t-num">${order.ticketNum}</span><span class="t-time ${ageClass(age)}">${ageStr(age)}</span></div><ul class="t-items">${itemsHTML}</ul><div class="t-actions">${actions}</div>${isCrit?`<div class="t-alert">⚠ Over 8 min — expedite now!</div>`:isUrgent?`<div class="t-alert" style="color:var(--lemon)">⏱ Over 5 min</div>`:''}`;
+    col.appendChild(t);
+  });
+}
+
+function bump(ticketNum,newStatus){
+  const ord=orders.find(o=>o.ticketNum===ticketNum);if(!ord)return;
+  if(newStatus==='done'){
+    orders=orders.filter(o=>o.ticketNum!==ticketNum);
+    doneCount++;
+    doneTickets.push({num:ticketNum,time:Date.now()});
+    if(doneTickets.length>30)doneTickets.shift();
+    // Update now-serving board
+    const serving=JSON.parse(localStorage.getItem('sw_serving')||'[]');
+    serving.push(ticketNum);
+    if(serving.length>10)serving.shift();
+    localStorage.setItem('sw_serving',JSON.stringify(serving));
+    localStorage.setItem('sw_last_ready',ticketNum);
+  }else{ord.status=newStatus}
+  saveAll();
+  // Also remove from sw_orders store if done/cancelled
+  const stored=JSON.parse(localStorage.getItem('sw_orders')||'[]');
+  localStorage.setItem('sw_orders',JSON.stringify(stored.filter(o=>o.ticketNum!==ticketNum||newStatus!=='done')));
+  renderBoard();
+}
+
+function askCancel(ticketNum){
+  pendingCancel=ticketNum;
+  document.getElementById('confirmOverlay').classList.add('open');
+  document.getElementById('confirmYes').onclick=()=>{
+    orders=orders.filter(o=>o.ticketNum!==pendingCancel);
+    const stored=JSON.parse(localStorage.getItem('sw_orders')||'[]');
+    localStorage.setItem('sw_orders',JSON.stringify(stored.filter(o=>o.ticketNum!==pendingCancel)));
+    saveOrders();closeConfirm();renderBoard();
+  };
+}
+function closeConfirm(){document.getElementById('confirmOverlay').classList.remove('open');pendingCancel=null}
+
+function renderDone(){
+  const row=document.getElementById('doneRow');
+  row.innerHTML='';
+  doneTickets.slice(-15).forEach(d=>{
+    const p=document.createElement('span');p.className='done-pill';
+    p.textContent=d.num+' ✓';row.appendChild(p);
+  });
+  if(!doneTickets.length){row.innerHTML='<span style="font-size:12px;color:var(--text3)">Completed orders will appear here</span>'}
+}
+
+function updateClock(){document.getElementById('clock').textContent=new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit',second:'2-digit'})}
+setInterval(updateClock,1000);
+setInterval(renderBoard,5000);
+updateClock();renderBoard();
+</script>
+</body>
+</html>
