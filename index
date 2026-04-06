@@ -1,0 +1,1061 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sweetwater Court</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700&family=Instrument+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0A0A0A;--s1:#111111;--s2:#181818;--s3:#222222;--s4:#2a2a2a;
+  --b1:rgba(255,255,255,0.06);--b2:rgba(255,255,255,0.12);--b3:rgba(255,255,255,0.2);
+  --ac:#C8F04A;--ac2:#A8D030;
+  --tx:#F5F5F0;--mu:rgba(245,245,240,0.45);--mu2:rgba(245,245,240,0.22);
+  --red:#FF4444;--amb:#F5A623;--grn:#4ADE80;--blue:#60A5FA;
+  --r:10px;--rl:16px;--rxl:22px;
+  --ff:'Instrument Sans',sans-serif;--fd:'Syne',sans-serif;
+}
+html,body{height:100%;font-family:var(--ff);background:var(--bg);color:var(--tx);font-size:14px;-webkit-font-smoothing:antialiased}
+button{font-family:var(--ff);cursor:pointer}
+input,textarea,select{font-family:var(--ff);color:var(--tx)}
+::-webkit-scrollbar{width:4px}::-webkit-scrollbar-thumb{background:var(--s3);border-radius:4px}
+
+/* ── TOPBAR ── */
+.bar{height:52px;background:var(--s1);border-bottom:1px solid var(--b1);display:flex;align-items:center;padding:0 20px;position:fixed;top:0;left:0;right:0;z-index:100}
+.logo{font-family:var(--fd);font-size:15px;font-weight:700;letter-spacing:.05em;margin-right:auto}
+.logo em{color:var(--ac);font-style:normal}
+.tabs{display:flex;gap:2px}
+.tab{background:none;border:none;color:var(--mu);font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;padding:7px 14px;border-radius:var(--r);transition:all .15s;white-space:nowrap}
+.tab:hover{color:var(--tx);background:var(--s2)}
+.tab.on{color:var(--tx);background:var(--s3)}
+.pill{background:var(--ac);color:#000;font-size:9px;font-weight:700;padding:1px 5px;border-radius:10px;margin-left:4px;vertical-align:middle}
+
+/* ── SOUND UNLOCK BANNER ── */
+.snd-banner{background:var(--amb);color:#000;font-size:12px;font-weight:600;text-align:center;padding:8px;cursor:pointer;display:none;position:fixed;top:52px;left:0;right:0;z-index:99}
+.snd-banner.show{display:block}
+
+/* ══ PAGES ══ */
+#pk{display:none}
+#pk.on{display:grid;grid-template-columns:1fr 340px;height:calc(100vh - 52px);margin-top:52px}
+#ps,#pb,#pa{display:none;margin-top:52px;min-height:calc(100vh - 52px)}
+#ps.on,#pb.on,#pa.on{display:block}
+#ps.on{display:grid;grid-template-columns:200px 1fr}
+
+/* ══ KIOSK ════════════════════════════════════ */
+.km{overflow-y:auto;padding:26px 20px}
+.kh h1{font-family:var(--fd);font-size:26px;font-weight:700;letter-spacing:-.02em;line-height:1.1;margin-bottom:4px}
+.kh h1 em{color:var(--ac);font-style:normal}
+.kh p{font-size:12px;color:var(--mu);margin-bottom:20px}
+.frow{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:14px}
+.fb{background:var(--s2);border:1px solid var(--b1);color:var(--mu);font-size:12px;font-weight:500;padding:5px 13px;border-radius:100px;transition:all .15s}
+.fb:hover{border-color:var(--b2);color:var(--tx)}
+.fb.on{background:var(--ac);border-color:var(--ac);color:#000;font-weight:700}
+.mgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:9px}
+.mc{background:var(--s1);border:1px solid var(--b1);border-radius:var(--rl);overflow:hidden;cursor:pointer;transition:border-color .15s,transform .15s;position:relative}
+.mc:hover{border-color:var(--b2);transform:translateY(-1px)}
+.mc[hidden]{display:none}
+.mc.sold-out{opacity:.45;pointer-events:none}
+.mth{height:100px;display:flex;align-items:center;justify-content:center;font-size:40px;background:var(--s2);position:relative}
+.mbg{position:absolute;top:7px;right:7px;background:var(--ac);color:#000;font-size:9px;font-weight:700;padding:2px 6px;border-radius:100px;text-transform:uppercase}
+.sold-tag{position:absolute;top:7px;left:7px;background:var(--red);color:#fff;font-size:9px;font-weight:700;padding:2px 6px;border-radius:100px;text-transform:uppercase}
+.mb{padding:11px}
+.mna{font-family:var(--fd);font-size:13px;font-weight:600;margin-bottom:2px}
+.mde{font-size:11px;color:var(--mu);line-height:1.4;margin-bottom:8px}
+.mft{display:flex;align-items:center;justify-content:space-between}
+.mpr{font-size:14px;font-weight:600}
+.madd{width:26px;height:26px;background:var(--ac);border:none;border-radius:50%;color:#000;font-size:18px;font-weight:700;line-height:1;display:flex;align-items:center;justify-content:center;transition:background .12s,transform .1s}
+.madd:hover{background:var(--ac2)}
+.madd:active{transform:scale(.88)}
+
+/* CART */
+.kc{background:var(--s1);border-left:1px solid var(--b1);display:flex;flex-direction:column;height:calc(100vh - 52px);overflow:hidden}
+.ch{padding:16px 16px 12px;border-bottom:1px solid var(--b1);display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.ch h2{font-family:var(--fd);font-size:15px;font-weight:700}
+.cc{font-size:11px;color:var(--mu)}
+.cbody{flex:1;overflow-y:auto;padding:8px 13px}
+.cemp{height:180px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;color:var(--mu2)}
+.cemp-i{font-size:26px;opacity:.35}
+.cemp-t{font-size:12px}
+.cline{display:flex;gap:8px;padding:9px 0;border-bottom:1px solid var(--b1);align-items:flex-start;animation:slin .2s ease}
+@keyframes slin{from{opacity:0;transform:translateX(6px)}to{opacity:1;transform:translateX(0)}}
+.cie{font-size:19px;flex-shrink:0;margin-top:1px}
+.cin{flex:1;min-width:0}
+.cna{font-size:13px;font-weight:500}
+.cmo{font-size:10px;color:var(--mu);margin-top:2px;line-height:1.4}
+.cqw{display:flex;align-items:center;gap:6px;margin-top:5px}
+.qb{width:20px;height:20px;background:var(--s3);border:1px solid var(--b1);border-radius:50%;color:var(--tx);font-size:12px;display:flex;align-items:center;justify-content:center;transition:background .1s}
+.qb:hover{background:var(--s2);border-color:var(--b2)}
+.qn{font-size:12px;font-weight:500;min-width:14px;text-align:center}
+.cpr{font-size:13px;font-weight:600;flex-shrink:0}
+.cfoot{padding:13px;border-top:1px solid var(--b1);flex-shrink:0}
+.tr{display:flex;justify-content:space-between;font-size:12px;color:var(--mu);margin-bottom:4px}
+.tr.tot{font-size:15px;font-weight:600;color:var(--tx);border-top:1px solid var(--b1);padding-top:8px;margin:8px 0 13px}
+.nl{font-size:10px;font-weight:600;letter-spacing:.09em;text-transform:uppercase;color:var(--mu);display:block;margin-bottom:4px}
+.ni{width:100%;background:var(--s2);border:1px solid var(--b1);border-radius:var(--r);padding:9px 12px;font-size:13px;outline:none;transition:border-color .15s;margin-bottom:10px}
+.ni:focus{border-color:var(--ac)}
+.ob{width:100%;background:var(--ac);border:none;border-radius:var(--r);color:#000;font-family:var(--fd);font-size:14px;font-weight:700;padding:13px;transition:background .15s,opacity .15s;letter-spacing:.02em}
+.ob:hover{background:var(--ac2)}
+.ob:disabled{opacity:.25;cursor:not-allowed;background:var(--s3);color:var(--mu)}
+
+/* ══ ITEM MODAL ══════════════════════════════ */
+.ov{display:none;position:fixed;inset:0;background:rgba(0,0,0,.82);z-index:200;align-items:flex-end;justify-content:center;backdrop-filter:blur(6px)}
+.ov.on{display:flex}
+.modal{background:var(--s1);border:1px solid var(--b2);border-radius:var(--rxl) var(--rxl) 0 0;width:100%;max-width:500px;max-height:88vh;overflow-y:auto;padding:22px;animation:mup .22s cubic-bezier(.34,1.56,.64,1)}
+@keyframes mup{from{transform:translateY(36px);opacity:0}to{transform:translateY(0);opacity:1}}
+.mtop{display:flex;gap:14px;align-items:center;margin-bottom:18px}
+.mico{font-size:42px}
+.minfo-n{font-family:var(--fd);font-size:19px;font-weight:700}
+.minfo-p{font-size:12px;color:var(--mu);margin-top:2px}
+.minfo-d{font-size:11px;color:var(--mu);margin-top:3px;line-height:1.5}
+.mg{margin-bottom:14px}
+.mgl{font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--mu);margin-bottom:7px}
+.mchips{display:flex;flex-wrap:wrap;gap:5px}
+.chip{background:var(--s2);border:1px solid var(--b1);color:var(--mu);font-size:12px;font-weight:500;padding:5px 12px;border-radius:100px;transition:all .12s}
+.chip:hover{border-color:var(--b2);color:var(--tx)}
+.chip.on{background:var(--ac);border-color:var(--ac);color:#000;font-weight:700}
+.chip.aon{background:rgba(200,240,74,.1);border-color:var(--ac);color:var(--ac)}
+.mnote{width:100%;background:var(--s2);border:1px solid var(--b1);border-radius:var(--r);padding:9px 12px;font-size:13px;resize:none;height:62px;outline:none;transition:border-color .15s}
+.mnote:focus{border-color:var(--ac)}
+.mbtns{display:flex;gap:8px;margin-top:16px}
+.mcan{flex:1;background:var(--s3);border:1px solid var(--b1);color:var(--mu);padding:11px;border-radius:var(--r);font-size:13px}
+.mgo{flex:2;background:var(--ac);border:none;color:#000;font-family:var(--fd);font-size:14px;font-weight:700;padding:11px;border-radius:var(--r);transition:background .15s}
+.mgo:hover{background:var(--ac2)}
+
+/* ══ CONFIRM ════════════════════════════════ */
+.cfov{display:none;position:fixed;inset:0;background:var(--bg);z-index:300;flex-direction:column;align-items:center;justify-content:center;text-align:center}
+.cfov.on{display:flex;animation:fin .3s ease}
+@keyframes fin{from{opacity:0}to{opacity:1}}
+.cfring{width:100px;height:100px;border:2px solid var(--ac);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:40px;margin-bottom:18px;animation:rp 2s ease infinite}
+@keyframes rp{0%,100%{box-shadow:0 0 0 0 rgba(200,240,74,.3)}50%{box-shadow:0 0 0 14px rgba(200,240,74,0)}}
+.cfnum{font-family:var(--fd);font-size:84px;font-weight:800;color:var(--ac);line-height:1;letter-spacing:-.04em}
+.cftit{font-family:var(--fd);font-size:24px;font-weight:700;margin:6px 0 3px}
+.cfsub{font-size:13px;color:var(--mu);margin-bottom:28px}
+.cfbtn{background:var(--s2);border:1px solid var(--b2);color:var(--tx);font-size:13px;font-weight:500;padding:11px 28px;border-radius:var(--r);transition:background .15s}
+.cfbtn:hover{background:var(--s3)}
+
+/* ══ STAFF PAGE ══════════════════════════════ */
+.ssb{background:var(--s1);border-right:1px solid var(--b1);padding:16px 12px;display:flex;flex-direction:column;gap:4px;overflow-y:auto;height:calc(100vh - 52px);position:sticky;top:52px}
+.sbr{font-family:var(--fd);font-size:13px;font-weight:700;letter-spacing:.04em;margin-bottom:12px}
+.sbr em{color:var(--ac);font-style:normal}
+.sc{background:var(--s2);border:1px solid var(--b1);border-radius:var(--r);padding:10px 12px;margin-bottom:2px}
+.sv{font-family:var(--fd);font-size:20px;font-weight:700}
+.sv.ac{color:var(--ac)}
+.slb{font-size:10px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--mu);margin-top:1px}
+.sdiv{height:1px;background:var(--b1);margin:5px 0}
+.sclk{font-family:var(--fd);font-size:17px;font-weight:600}
+.sdt{font-size:11px;color:var(--mu);margin-top:1px}
+.stog{display:flex;align-items:center;gap:7px;font-size:11px;color:var(--mu);padding-top:8px}
+.sw{width:32px;height:18px;background:var(--s3);border-radius:100px;position:relative;cursor:pointer;border:1px solid var(--b2);transition:background .2s;flex-shrink:0}
+.sw.on{background:var(--ac)}
+.sk{width:12px;height:12px;background:#fff;border-radius:50%;position:absolute;top:2px;left:2px;transition:transform .2s}
+.sw.on .sk{transform:translateX(14px)}
+
+/* kanban */
+.kban{display:grid;grid-template-columns:1fr 1fr 1fr;gap:1px;background:var(--b1);height:calc(100vh - 52px);overflow:hidden}
+.kcol{background:var(--bg);display:flex;flex-direction:column;overflow:hidden}
+.kch{padding:13px 12px 10px;border-bottom:1px solid var(--b1);display:flex;align-items:center;gap:6px;background:var(--s1);flex-shrink:0}
+.kdot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+.ktit{font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--mu)}
+.kcnt{margin-left:auto;font-size:11px;font-weight:700}
+.kcds{flex:1;overflow-y:auto;padding:9px;display:flex;flex-direction:column;gap:7px}
+.kemp{padding:20px;text-align:center;font-size:12px;color:var(--mu2)}
+
+/* TICKET */
+.tkt{background:var(--s1);border:1px solid var(--b1);border-radius:var(--rl);padding:12px;transition:border-color .15s;animation:tin .2s ease}
+@keyframes tin{from{opacity:0;transform:translateY(-5px)}to{opacity:1;transform:translateY(0)}}
+.tkt:hover{border-color:var(--b2)}
+.tkt.urg{border-color:var(--red)}
+.tkt.new-flash{animation:flash 1s ease}
+@keyframes flash{0%,100%{border-color:var(--b1)}50%{border-color:var(--ac);box-shadow:0 0 0 2px rgba(200,240,74,.2)}}
+.tkth{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:8px}
+.tktnum{font-family:var(--fd);font-size:18px;font-weight:700}
+.tktcu{font-size:10px;color:var(--mu);margin-top:1px}
+.tkttm{font-size:10px;font-weight:700;background:var(--s3);padding:3px 7px;border-radius:100px;color:var(--mu);font-variant-numeric:tabular-nums;white-space:nowrap}
+.tkttm.w{background:rgba(245,166,35,.12);color:var(--amb)}
+.tkttm.r{background:rgba(255,68,68,.12);color:var(--red)}
+
+/* ticket items — this is the key part */
+.tktits{margin-bottom:8px;display:flex;flex-direction:column;gap:10px}
+.tkt-item-block{background:var(--s2);border-radius:10px;padding:10px 11px;border:1px solid var(--b1)}
+.tkt-item-head{display:flex;align-items:center;gap:7px;margin-bottom:6px}
+.tkt-item-ico{font-size:16px;flex-shrink:0}
+.tkt-item-name{font-family:var(--fd);font-size:13px;font-weight:600;color:var(--tx)}
+.tkt-item-qty{background:var(--ac);color:#000;font-size:10px;font-weight:700;padding:1px 6px;border-radius:100px;margin-left:auto}
+.tkt-item-mods{font-size:11px;color:var(--ac);margin-bottom:6px;font-weight:500}
+.tkt-item-mods span{margin-right:6px}
+
+/* RECIPE STEPS on ticket */
+.tkt-recipe{border-top:1px dashed var(--b2);padding-top:7px;margin-top:4px}
+.tkt-recipe-title{font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--mu2);margin-bottom:5px}
+.tkt-step{display:flex;gap:7px;font-size:11px;color:var(--mu);line-height:1.4;margin-bottom:3px;align-items:flex-start}
+.tkt-step-num{background:var(--s3);color:var(--mu);font-size:9px;font-weight:700;width:16px;height:16px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
+.tkt-ingredients{font-size:10px;color:var(--mu);margin-bottom:5px;display:flex;flex-wrap:wrap;gap:4px}
+.tkt-ing-chip{background:var(--s3);border:1px solid var(--b1);padding:2px 7px;border-radius:100px;font-size:10px;color:var(--mu)}
+
+.tktnote{background:rgba(245,166,35,.08);border-left:2px solid var(--amb);padding:5px 8px;border-radius:0 5px 5px 0;font-size:10px;color:var(--amb);margin-top:4px}
+.tktbs{display:flex;gap:5px;margin-top:8px}
+.tb{flex:1;border:1px solid var(--b1);background:var(--s2);color:var(--mu);font-size:11px;font-weight:700;letter-spacing:.03em;padding:8px;border-radius:8px;transition:all .12s}
+.tb:hover{color:var(--tx);border-color:var(--b2)}
+.tb.pr{background:var(--ac);border-color:var(--ac);color:#000}
+.tb.pr:hover{background:var(--ac2)}
+.tb.dn{background:var(--s3);color:var(--mu2);border-color:transparent}
+.tb.dn:hover{color:var(--tx);background:var(--s2)}
+.tlb{flex:0;background:var(--s3);border:1px solid var(--b1);color:var(--mu);font-size:13px;width:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;transition:all .12s}
+.tlb:hover{color:var(--tx);border-color:var(--b2)}
+
+/* ══ CUP LABEL ════════════════════════════════ */
+.lbov{display:none;position:fixed;inset:0;background:rgba(0,0,0,.88);z-index:400;align-items:center;justify-content:center;backdrop-filter:blur(8px)}
+.lbov.on{display:flex}
+.lbpan{background:var(--s1);border:1px solid var(--b2);border-radius:var(--rxl);padding:22px;width:420px;max-width:95vw;max-height:90vh;overflow-y:auto}
+.lbtit{font-family:var(--fd);font-size:15px;font-weight:700;margin-bottom:14px}
+.cup-label{background:#fff;border-radius:10px;padding:13px 15px;margin-bottom:9px;color:#111;font-family:'Syne',sans-serif;position:relative;overflow:hidden}
+.cup-label::before{content:'';position:absolute;top:0;left:0;width:4px;height:100%;background:#C8F04A}
+.lbbr{font-size:8px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:#999;margin-bottom:4px}
+.lbdn{font-size:15px;font-weight:700;color:#111;line-height:1.1;margin-bottom:3px}
+.lbcu{font-size:11px;color:#555;margin-bottom:4px}
+.lbmo{font-size:10px;color:#777;line-height:1.6}
+.lbft{display:flex;align-items:center;justify-content:space-between;margin-top:8px;padding-top:7px;border-top:1px solid #eee}
+.lbnum{font-family:'Syne',sans-serif;font-size:17px;font-weight:800;color:#111}
+.lbtm{font-size:9px;color:#aaa}
+.lbbs{display:flex;gap:8px;margin-top:14px}
+.lbca{flex:1;background:var(--s3);border:1px solid var(--b1);color:var(--mu);padding:10px;border-radius:var(--r);font-size:13px}
+.lbpr{flex:2;background:var(--ac);border:none;color:#000;font-family:var(--fd);font-size:13px;font-weight:700;padding:10px;border-radius:var(--r)}
+
+/* ══ BOARD PAGE ══════════════════════════════ */
+.bi{max-width:860px;margin:0 auto;padding:44px 20px}
+.blo{font-family:var(--fd);font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--mu2);text-align:center;margin-bottom:40px}
+.blo em{color:var(--ac);font-style:normal}
+.bsec{font-size:10px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--mu2);margin-bottom:12px}
+.brg{display:grid;grid-template-columns:repeat(auto-fill,minmax(108px,1fr));gap:10px;margin-bottom:40px}
+.brc{background:var(--ac);border-radius:var(--rl);padding:16px 10px;text-align:center;animation:pop .35s cubic-bezier(.34,1.56,.64,1)}
+@keyframes pop{from{transform:scale(.7);opacity:0}to{transform:scale(1);opacity:1}}
+.brn{font-family:var(--fd);font-size:32px;font-weight:800;color:#000;line-height:1}
+.brnm{font-size:10px;color:rgba(0,0,0,.6);margin-top:3px;font-weight:600}
+.bmr{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:36px}
+.bmp{background:var(--s1);border:1px solid var(--b2);border-radius:100px;padding:6px 16px;font-family:var(--fd);font-size:13px;font-weight:600;color:var(--tx);animation:fin .2s ease}
+@keyframes fin{from{opacity:0}to{opacity:1}}
+.bnth{color:var(--mu2);font-size:12px;padding:14px 0}
+.bw{text-align:center;padding:18px;border:1px solid var(--b1);border-radius:var(--rl);font-size:13px;color:var(--mu)}
+.bw strong{color:var(--ac)}
+
+/* ══ MENU ADMIN PAGE ══════════════════════════ */
+.admin-wrap{max-width:1000px;margin:0 auto;padding:28px 22px}
+.admin-head{display:flex;align-items:center;gap:12px;margin-bottom:24px}
+.admin-head h2{font-family:var(--fd);font-size:22px;font-weight:700;flex:1}
+.abtn{background:var(--ac);border:none;color:#000;font-family:var(--fd);font-size:12px;font-weight:700;padding:9px 18px;border-radius:var(--r);transition:background .15s;letter-spacing:.03em}
+.abtn:hover{background:var(--ac2)}
+.abtn.sec{background:var(--s3);color:var(--mu);border:1px solid var(--b2)}
+.abtn.sec:hover{color:var(--tx);background:var(--s4)}
+.abtn.danger{background:rgba(255,68,68,.12);color:var(--red);border:1px solid rgba(255,68,68,.2)}
+.abtn.danger:hover{background:rgba(255,68,68,.22)}
+
+/* menu items list */
+.alist{display:flex;flex-direction:column;gap:10px}
+.aitem{background:var(--s1);border:1px solid var(--b1);border-radius:var(--rl);padding:16px;display:flex;gap:14px;align-items:flex-start;transition:border-color .15s}
+.aitem:hover{border-color:var(--b2)}
+.aitem-ico{font-size:36px;flex-shrink:0}
+.aitem-info{flex:1;min-width:0}
+.aitem-name{font-family:var(--fd);font-size:14px;font-weight:700;margin-bottom:2px}
+.aitem-meta{font-size:11px;color:var(--mu);margin-bottom:6px}
+.aitem-recipe-preview{font-size:11px;color:var(--mu2);line-height:1.5;border-top:1px solid var(--b1);padding-top:6px;margin-top:6px}
+.aitem-actions{display:flex;gap:6px;flex-shrink:0}
+.cat-badge{display:inline-block;background:var(--s3);color:var(--mu);font-size:10px;font-weight:600;padding:2px 8px;border-radius:100px;text-transform:uppercase;letter-spacing:.06em;margin-right:6px}
+.sold-badge{background:rgba(255,68,68,.12);color:var(--red)}
+
+/* EDITOR MODAL */
+.ed-ov{display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:500;align-items:center;justify-content:center;backdrop-filter:blur(6px);overflow-y:auto;padding:20px}
+.ed-ov.on{display:flex}
+.ed-modal{background:var(--s1);border:1px solid var(--b2);border-radius:var(--rxl);padding:26px;width:640px;max-width:95vw;max-height:90vh;overflow-y:auto;animation:mup .2s ease}
+.ed-title{font-family:var(--fd);font-size:18px;font-weight:700;margin-bottom:20px}
+.ed-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px}
+.ed-full{grid-column:1/-1}
+.field-label{font-size:10px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--mu);display:block;margin-bottom:5px}
+.field-input{width:100%;background:var(--s2);border:1px solid var(--b1);border-radius:var(--r);padding:9px 12px;font-size:13px;outline:none;transition:border-color .15s}
+.field-input:focus{border-color:var(--ac)}
+.field-input.ta{resize:vertical;min-height:68px}
+select.field-input option{background:var(--s2);color:var(--tx)}
+.ed-section{background:var(--s2);border:1px solid var(--b1);border-radius:var(--r);padding:14px;margin-bottom:14px}
+.ed-section-title{font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--mu);margin-bottom:10px;display:flex;align-items:center;justify-content:space-between}
+.ing-row{display:flex;gap:8px;margin-bottom:7px;align-items:center}
+.ing-row input{flex:1;background:var(--s3);border:1px solid var(--b1);border-radius:8px;padding:7px 10px;font-size:12px;outline:none;transition:border-color .15s;color:var(--tx)}
+.ing-row input:focus{border-color:var(--ac)}
+.ing-row input.sm{width:80px;flex:none}
+.rm-btn{background:none;border:none;color:var(--mu2);font-size:16px;padding:4px;transition:color .12s;flex-shrink:0}
+.rm-btn:hover{color:var(--red)}
+.step-row{display:flex;gap:8px;margin-bottom:7px;align-items:flex-start}
+.step-num-badge{background:var(--s3);color:var(--mu);font-size:10px;font-weight:700;width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:7px}
+.step-row textarea{flex:1;background:var(--s3);border:1px solid var(--b1);border-radius:8px;padding:7px 10px;font-size:12px;outline:none;resize:none;height:52px;transition:border-color .15s;color:var(--tx);font-family:var(--ff)}
+.step-row textarea:focus{border-color:var(--ac)}
+.add-row-btn{background:none;border:1px dashed var(--b2);color:var(--mu);font-size:12px;padding:7px 14px;border-radius:8px;width:100%;transition:all .12s;cursor:pointer}
+.add-row-btn:hover{border-color:var(--ac);color:var(--ac)}
+.ed-btns{display:flex;gap:8px;margin-top:6px}
+.toggle-check{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--mu);cursor:pointer}
+.toggle-check input{width:16px;height:16px;accent-color:var(--ac);cursor:pointer}
+
+/* ── PRINT ── */
+@media print{body>*{display:none!important}#prt{display:block!important;padding:16px}.cup-label{border:1px solid #ddd;margin-bottom:12px;break-inside:avoid}}
+</style>
+</head>
+<body>
+
+<!-- TOPBAR -->
+<header class="bar">
+  <div class="logo">Sweetwater<em>.</em></div>
+  <div class="tabs">
+    <button class="tab on" onclick="go('k',this)">Order</button>
+    <button class="tab" onclick="go('s',this)">Kitchen <span class="pill" id="badge">0</span></button>
+    <button class="tab" onclick="go('b',this)">Pickup</button>
+    <button class="tab" onclick="go('a',this)">Menu Editor</button>
+  </div>
+</header>
+
+<!-- Sound unlock banner -->
+<div class="snd-banner" id="snd-banner" onclick="unlockSound()">
+  🔔 Tap here to enable kitchen sound alerts
+</div>
+
+<!-- ═══ KIOSK ═══ -->
+<div id="pk" class="on">
+  <div class="km">
+    <div class="kh">
+      <h1>Order at<br>Sweetwater<em>.</em></h1>
+      <p>Artisan lemonades · made fresh to order · Charlotte, NC</p>
+    </div>
+    <div class="frow" id="frow"></div>
+    <div class="mgrid" id="mgrid"></div>
+  </div>
+  <div class="kc">
+    <div class="ch"><h2>Your Order</h2><span class="cc" id="ccount"></span></div>
+    <div class="cbody" id="cbody">
+      <div class="cemp"><div class="cemp-i">🍋</div><div class="cemp-t">Nothing added yet</div></div>
+    </div>
+    <div class="cfoot" id="cfoot" style="display:none">
+      <div id="ctot"></div>
+      <label class="nl" for="cname">Your name for pickup</label>
+      <input class="ni" id="cname" type="text" placeholder="e.g. Jordan" maxlength="22" oninput="rfbtn()">
+      <button class="ob" id="obtn" onclick="placeOrder()" disabled>Place Order</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ STAFF ═══ -->
+<div id="ps">
+  <div class="ssb">
+    <div class="sbr">Sweetwater<em>.</em></div>
+    <div class="sc"><div class="sv ac" id="sq">0</div><div class="slb">In Queue</div></div>
+    <div class="sc"><div class="sv" id="sm">0</div><div class="slb">Making</div></div>
+    <div class="sc"><div class="sv" id="sd">0</div><div class="slb">Done Today</div></div>
+    <div class="sc"><div class="sv" id="sr">$0</div><div class="slb">Revenue</div></div>
+    <div class="sdiv"></div>
+    <div class="sclk" id="sclk"></div>
+    <div class="sdt" id="sdt"></div>
+    <div class="sdiv"></div>
+    <div class="stog">
+      <div class="sw on" id="swtog" onclick="togSnd(this)"><div class="sk"></div></div>
+      <span>Sound alerts</span>
+    </div>
+  </div>
+  <div class="kban">
+    <div class="kcol">
+      <div class="kch"><div class="kdot" style="background:var(--amb)"></div><span class="ktit">New Orders</span><span class="kcnt" id="cn" style="color:var(--amb)"></span></div>
+      <div class="kcds" id="cnew"></div>
+    </div>
+    <div class="kcol">
+      <div class="kch"><div class="kdot" style="background:var(--ac)"></div><span class="ktit">In Progress</span><span class="kcnt" id="cm" style="color:var(--ac)"></span></div>
+      <div class="kcds" id="cmak"></div>
+    </div>
+    <div class="kcol">
+      <div class="kch"><div class="kdot" style="background:var(--grn)"></div><span class="ktit">Ready</span><span class="kcnt" id="cr" style="color:var(--grn)"></span></div>
+      <div class="kcds" id="crdy"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ BOARD ═══ -->
+<div id="pb">
+  <div class="bi">
+    <div class="blo">Sweetwater<em>.</em></div>
+    <div class="bsec">Ready for Pickup</div>
+    <div class="brg" id="brd"></div>
+    <div class="bsec">Being Made</div>
+    <div class="bmr" id="bmk"></div>
+    <div id="bwt" style="display:none"><div class="bw">Estimated wait: <strong id="bwv">—</strong></div></div>
+  </div>
+</div>
+
+<!-- ═══ MENU ADMIN ═══ -->
+<div id="pa">
+  <div class="admin-wrap">
+    <div class="admin-head">
+      <h2>Menu Editor</h2>
+      <button class="abtn" onclick="openEditor(null)">+ Add Item</button>
+    </div>
+    <div class="alist" id="alist"></div>
+  </div>
+</div>
+
+<!-- ═══ ITEM ORDER MODAL ═══ -->
+<div class="ov" id="iov" onclick="if(event.target.id==='iov')clov('iov')">
+  <div class="modal" id="imc"></div>
+</div>
+
+<!-- ═══ LABEL OVERLAY ═══ -->
+<div class="lbov" id="lov" onclick="if(event.target.id==='lov')clov('lov')">
+  <div class="lbpan">
+    <div class="lbtit">Cup Label Preview</div>
+    <div id="lbpv"></div>
+    <div class="lbbs">
+      <button class="lbca" onclick="clov('lov')">Cancel</button>
+      <button class="lbpr" onclick="doPrint()">🖨 Print Labels</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ MENU EDITOR MODAL ═══ -->
+<div class="ed-ov" id="edov" onclick="if(event.target.id==='edov')clov('edov')">
+  <div class="ed-modal" id="edmc"></div>
+</div>
+
+<!-- ═══ CONFIRM ═══ -->
+<div class="cfov" id="cfov">
+  <div class="cfring">🍋</div>
+  <div class="cfnum" id="cfn">#00</div>
+  <div class="cftit">Order placed!</div>
+  <div class="cfsub" id="cfs">We'll call your name when it's ready</div>
+  <button class="cfbtn" onclick="dcf()">Order Something Else</button>
+</div>
+
+<div id="prt" style="display:none"></div>
+
+<script>
+/* ═══════════════════════════════════════════
+   DEFAULT MENU DATA  (editable in Menu Editor)
+═══════════════════════════════════════════ */
+const DEFAULT_MENU = [
+  {
+    id:1, cat:'signature', e:'🍋', n:'Classic Sweetwater', d:'House-pressed lemon, cane sugar, filtered water', p:5.50, soldOut:false,
+    ingredients:['2 oz fresh-squeezed lemon juice','1 oz cane sugar syrup (1:1)','8 oz filtered water','Lemon wheel garnish'],
+    steps:['Fill 16oz cup with ice to the brim.','Add lemon juice then sugar syrup.','Top with filtered water. Stir gently 3×.','Garnish with lemon wheel on rim.']
+  },
+  {
+    id:2, cat:'signature', e:'🌿', n:'Mint Julep Lemon', d:'Fresh mint, lemon, light honey syrup', p:6.50, b:'Fan Fave', soldOut:false,
+    ingredients:['2 oz fresh lemon juice','1 oz honey syrup (2:1 honey:water)','6-8 fresh mint leaves','8 oz water','Mint sprig garnish'],
+    steps:['Muddle mint leaves gently in cup bottom — do NOT over-muddle.','Add ice to brim.','Pour lemon juice and honey syrup over ice.','Top with water, stir once.','Slap a fresh mint sprig to release oils, place on top.']
+  },
+  {
+    id:3, cat:'signature', e:'🍓', n:'Strawberry Fields', d:'Real strawberry purée, Meyer lemon, basil', p:7.00, soldOut:false,
+    ingredients:['1.5 oz Meyer lemon juice','1.5 oz fresh strawberry purée (blend 4 strawberries + 0.5oz simple syrup)','0.75 oz simple syrup','8 oz water','Basil leaf + strawberry garnish'],
+    steps:['Make purée: blend 4 ripe strawberries + 0.5oz simple, strain seeds.','Fill cup with ice.','Add lemon juice, strawberry purée, simple syrup.','Top with water. Stir well.','Garnish: basil leaf + halved strawberry on rim.']
+  },
+  {
+    id:4, cat:'seasonal', e:'🫐', n:'Blueberry Thyme', d:'Blueberry, thyme syrup, sea salt', p:7.50, b:'Seasonal', soldOut:false,
+    ingredients:['2 oz blueberry syrup (see recipe card)','1.5 oz lemon juice','Pinch flaky sea salt','8 oz water','Fresh thyme sprig'],
+    steps:['Blueberry syrup: simmer 1c blueberries + 1c sugar + 1c water 10 min, strain, add 3 thyme sprigs while hot.','Fill cup with ice.','Add blueberry syrup and lemon juice.','Add a tiny pinch of flaky sea salt.','Top with water, stir, garnish with thyme sprig.']
+  },
+  {
+    id:5, cat:'seasonal', e:'🍑', n:'Peach Cardamom', d:'White peach, cardamom, rose water', p:7.50, b:'Seasonal', soldOut:false,
+    ingredients:['2 oz white peach purée','1.5 oz lemon juice','0.75 oz cardamom syrup','2 drops rose water','8 oz water'],
+    steps:['Cardamom syrup: 1c sugar + 1c water + 8 crushed pods, simmer 8 min, cool.','Fill cup with ice.','Add peach purée, lemon, cardamom syrup.','Add exactly 2 drops rose water (strong — don\'t over-do it).','Top with water, stir, garnish with dried rose petal.']
+  },
+  {
+    id:6, cat:'sparkling', e:'✨', n:'Sparkle & Citrus', d:'Yuzu, Meyer lemon, sparkling water, mint', p:7.00, soldOut:false,
+    ingredients:['1 oz yuzu juice (or sub Meyer lemon)','1 oz Meyer lemon juice','0.75 oz simple syrup','6 oz sparkling water (Topo Chico preferred)','Mint sprig'],
+    steps:['Fill cup with ice.','Add yuzu and Meyer lemon juice, then simple syrup.','Pour sparkling water slowly down the side of the cup (preserve carbonation).','Do NOT stir — just lift gently once.','Slap mint sprig, garnish on top.']
+  },
+  {
+    id:7, cat:'sparkling', e:'🫧', n:'Elderflower Fizz', d:'Elderflower, lemon verbena, CO₂', p:7.50, b:'New', soldOut:false,
+    ingredients:['1.5 oz St. Germain or elderflower syrup','1 oz lemon juice','0.5 oz lemon verbena syrup','6 oz sparkling water','Lemon twist'],
+    steps:['Fill cup with ice.','Combine elderflower syrup, lemon juice, verbena syrup over ice.','Pour sparkling water slowly — hold cup at angle.','Express lemon peel over top, drop in.','Garnish with edible flower if available.']
+  },
+  {
+    id:8, cat:'wellness', e:'🧡', n:'Golden Turmeric Aid', d:'Turmeric, ginger, lemon, black pepper, agave', p:8.00, soldOut:false,
+    ingredients:['1.5 oz fresh lemon juice','0.75 oz agave syrup','0.5 oz fresh ginger juice (press or grate+strain)','0.25 tsp ground turmeric','Pinch black pepper (essential for curcumin absorption)','8 oz water'],
+    steps:['Combine turmeric + black pepper in cup first (dry).','Add ice.','Add ginger juice, lemon juice, agave.','Pour water and stir vigorously — turmeric needs movement to mix.','Taste and adjust agave. Should be bright + warming.']
+  },
+  {
+    id:9, cat:'wellness', e:'🌸', n:'Hibiscus Rose', d:'Dried hibiscus, rose water, lemon, honey', p:7.50, soldOut:false,
+    ingredients:['2 oz hibiscus concentrate (brew 2 tbsp dried hibiscus in 8oz hot water 10 min, cool)','1 oz lemon juice','0.75 oz honey syrup','2 drops rose water','6 oz water'],
+    steps:['Brew hibiscus concentrate in advance, refrigerate.','Fill cup with ice.','Add hibiscus concentrate, lemon juice, honey syrup.','Add 2 drops rose water only.','Top with water, stir. Beautiful deep red color — show the customer before adding ice if doing it tableside.']
+  },
+  {
+    id:10, cat:'addon', e:'💧', n:'Boba Pearls', d:'Classic black tapioca pearls', p:1.50, soldOut:false,
+    ingredients:['3 oz cooked black tapioca pearls','1 tbsp brown sugar syrup to coat'],
+    steps:['Scoop 3oz pearls into cup before ice.','Drizzle brown sugar syrup over pearls.','Add ice on top, then build drink as normal.','Remind customer: boba straw needed — grab from counter.']
+  },
+  {
+    id:11, cat:'addon', e:'🌿', n:'Herb Sprig', d:'Basil, mint, or rosemary', p:1.00, soldOut:false,
+    ingredients:['Fresh herb sprig (basil, mint, or rosemary)'],
+    steps:['Ask customer which herb.','Slap sprig firmly between palms to release oils.','Place prominently on top of drink.']
+  },
+  {
+    id:12, cat:'addon', e:'🍊', n:'Citrus Float', d:'Blood orange or grapefruit wedge', p:1.00, soldOut:false,
+    ingredients:['1 thick wedge blood orange or grapefruit'],
+    steps:['Cut thick wedge (ask customer which citrus).','Score the peel and balance on rim of cup.']
+  }
+];
+
+/* Load from localStorage or use defaults */
+function loadMenu(){
+  try{
+    const saved = localStorage.getItem('sw_menu');
+    return saved ? JSON.parse(saved) : JSON.parse(JSON.stringify(DEFAULT_MENU));
+  }catch(e){ return JSON.parse(JSON.stringify(DEFAULT_MENU)); }
+}
+function saveMenu(){ localStorage.setItem('sw_menu', JSON.stringify(MENU)); }
+let MENU = loadMenu();
+
+const CATS=['all','signature','seasonal','sparkling','wellness','addon'];
+const SU=['No sugar','¼ sweet','½ sweet','Regular','Extra sweet'];
+const IC=['No ice','Light ice','Regular ice','Extra ice'];
+const SZ=['12 oz','16 oz +$1','24 oz +$2'];
+
+let cart=[],orders=[],tn=100,dn=0,rev=0,sndOn=true,prevNw=0,prevRd=0;
+let aItem=null,aM={};
+let audioCtx=null,audioUnlocked=false;
+
+/* ═══════════════════════════════════════════
+   SOUND — with proper browser unlock
+═══════════════════════════════════════════ */
+function initAudio(){
+  if(audioCtx) return;
+  try{
+    audioCtx = new(window.AudioContext||window.webkitAudioContext)();
+    // Play a silent buffer to unlock
+    const buf = audioCtx.createBuffer(1,1,22050);
+    const src = audioCtx.createBufferSource();
+    src.buffer = buf; src.connect(audioCtx.destination); src.start(0);
+    audioUnlocked = true;
+    document.getElementById('snd-banner').classList.remove('show');
+  }catch(e){ console.warn('Audio init failed',e); }
+}
+
+function unlockSound(){
+  initAudio();
+  document.getElementById('snd-banner').classList.remove('show');
+  // play a test chime so staff knows it's working
+  playChime('new');
+}
+
+function playChime(type){
+  if(!sndOn) return;
+  if(!audioCtx || audioCtx.state === 'suspended'){
+    // show the banner asking user to tap
+    document.getElementById('snd-banner').classList.add('show');
+    return;
+  }
+  try{
+    const t = audioCtx.currentTime;
+    if(type === 'new'){
+      // Ascending 3-note chime for new orders
+      [[523.25,0,.15],[659.25,.16,.15],[783.99,.32,.25]].forEach(([f,d,du])=>{
+        const o=audioCtx.createOscillator(),g=audioCtx.createGain();
+        o.connect(g);g.connect(audioCtx.destination);
+        o.type='triangle';o.frequency.value=f;
+        g.gain.setValueAtTime(0,t+d);
+        g.gain.linearRampToValueAtTime(.22,t+d+.03);
+        g.gain.exponentialRampToValueAtTime(.001,t+d+du);
+        o.start(t+d);o.stop(t+d+du+.1);
+      });
+    } else if(type === 'ready'){
+      // Two-tone descending bell for ready
+      [[880,0,.08],[1046.5,.09,.08],[880,.18,.2]].forEach(([f,d,du])=>{
+        const o=audioCtx.createOscillator(),g=audioCtx.createGain();
+        o.connect(g);g.connect(audioCtx.destination);
+        o.type='sine';o.frequency.value=f;
+        g.gain.setValueAtTime(0,t+d);
+        g.gain.linearRampToValueAtTime(.25,t+d+.02);
+        g.gain.exponentialRampToValueAtTime(.001,t+d+du);
+        o.start(t+d);o.stop(t+d+du+.1);
+      });
+    }
+  }catch(e){ console.warn('Chime error',e); }
+}
+
+function togSnd(el){
+  sndOn=!sndOn;
+  el.classList.toggle('on',sndOn);
+  if(sndOn) initAudio();
+}
+
+/* ═══════════════════════════════════════════
+   MENU RENDER
+═══════════════════════════════════════════ */
+function rMenu(){
+  const cats = [...new Set(MENU.map(m=>m.cat))];
+  const allCats = ['all',...cats.filter(c=>c!=='addon'),'addon'];
+  document.getElementById('frow').innerHTML=
+    allCats.map(c=>`<button class="fb${c==='all'?' on':''}" onclick="fcat('${c}',this)">${c==='all'?'All':c[0].toUpperCase()+c.slice(1)}</button>`).join('');
+  document.getElementById('mgrid').innerHTML=
+    MENU.map(it=>`<div class="mc${it.soldOut?' sold-out':''}" data-cat="${it.cat}" onclick="oItem(${it.id})">
+      <div class="mth">
+        ${it.b?`<div class="mbg">${it.b}</div>`:''}
+        ${it.soldOut?'<div class="sold-tag">86\'d</div>':''}
+        ${it.e}
+      </div>
+      <div class="mb">
+        <div class="mna">${it.n}</div>
+        <div class="mde">${it.d}</div>
+        <div class="mft">
+          <span class="mpr">$${Number(it.p).toFixed(2)}</span>
+          <button class="madd" onclick="event.stopPropagation();oItem(${it.id})">+</button>
+        </div>
+      </div>
+    </div>`).join('');
+}
+function fcat(cat,btn){
+  document.querySelectorAll('.fb').forEach(b=>b.classList.remove('on'));btn.classList.add('on');
+  document.querySelectorAll('.mc').forEach(el=>el.hidden=(cat!=='all'&&el.dataset.cat!==cat));
+}
+
+/* ═══════════════════════════════════════════
+   ITEM MODAL (order customization)
+═══════════════════════════════════════════ */
+function oItem(id){
+  aItem=MENU.find(m=>m.id===id);
+  if(!aItem||aItem.soldOut) return;
+  aM={sugar:'Regular',ice:'Regular ice',size:'12 oz',addons:[],note:''};
+  const ia=aItem.cat==='addon';
+  document.getElementById('imc').innerHTML=`
+    <div class="mtop">
+      <div class="mico">${aItem.e}</div>
+      <div>
+        <div class="minfo-n">${aItem.n}</div>
+        <div class="minfo-p">from $${Number(aItem.p).toFixed(2)}</div>
+        <div class="minfo-d">${aItem.d}</div>
+      </div>
+    </div>
+    ${ia?'':cg('Sweetness','sugar',SU,'Regular')+cg('Ice','ice',IC,'Regular ice')+cg('Size','size',SZ,'12 oz')+`
+    <div class="mg">
+      <div class="mgl">Add-ons</div>
+      <div class="mchips">${MENU.filter(m=>m.cat==='addon'&&!m.soldOut).map(a=>`<button class="chip" onclick="togA(${a.id},'${a.n}',${a.p},this)">${a.e} ${a.n} +$${Number(a.p).toFixed(2)}</button>`).join('')}</div>
+    </div>
+    <div class="mg">
+      <div class="mgl">Note for staff</div>
+      <textarea class="mnote" placeholder="Allergy? Special request?" oninput="aM.note=this.value"></textarea>
+    </div>`}
+    <div class="mbtns">
+      <button class="mcan" onclick="clov('iov')">Cancel</button>
+      <button class="mgo" onclick="addCart()">Add to Order</button>
+    </div>`;
+  olov('iov');
+}
+function cg(lbl,key,opts,def){
+  return`<div class="mg"><div class="mgl">${lbl}</div><div class="mchips">${opts.map(o=>`<button class="chip${o===def?' on':''}" data-k="${key}" onclick="selC('${key}','${o}',this)">${o}</button>`).join('')}</div></div>`;
+}
+function selC(k,v,el){el.closest('.mchips').querySelectorAll(`[data-k="${k}"]`).forEach(b=>b.classList.remove('on'));el.classList.add('on');aM[k]=v;}
+function togA(id,name,price,el){
+  el.classList.toggle('on');el.classList.toggle('aon');
+  const i=aM.addons.findIndex(a=>a.id===id);
+  if(i>=0)aM.addons.splice(i,1);else aM.addons.push({id,name,price});
+}
+function addCart(){
+  const sx=aM.size==='16 oz +$1'?1:aM.size==='24 oz +$2'?2:0;
+  const ax=aM.addons.reduce((s,a)=>s+Number(a.price),0);
+  const mods=[];
+  if(aItem.cat!=='addon'){
+    if(aM.sugar&&aM.sugar!=='Regular')mods.push(aM.sugar);
+    if(aM.ice&&aM.ice!=='Regular ice')mods.push(aM.ice);
+    if(sx)mods.push(aM.size.split(' ').slice(0,2).join(' '));
+    aM.addons.forEach(a=>mods.push('+ '+a.name));
+  }
+  cart.push({uid:Date.now()+Math.random(),item:JSON.parse(JSON.stringify(aItem)),mods,note:aM.note||'',price:Number(aItem.p)+sx+ax,qty:1});
+  clov('iov');rCart();
+}
+
+/* ═══════════════════════════════════════════
+   CART
+═══════════════════════════════════════════ */
+function rCart(){
+  const body=document.getElementById('cbody'),foot=document.getElementById('cfoot'),cc=document.getElementById('ccount');
+  if(!cart.length){
+    body.innerHTML='<div class="cemp"><div class="cemp-i">🍋</div><div class="cemp-t">Nothing added yet</div></div>';
+    foot.style.display='none';cc.textContent='';return;
+  }
+  const tot=cart.reduce((s,l)=>s+l.qty,0);
+  cc.textContent=`${tot} item${tot!==1?'s':''}`;
+  foot.style.display='';
+  body.innerHTML=cart.map(l=>`
+    <div class="cline">
+      <div class="cie">${l.item.e}</div>
+      <div class="cin">
+        <div class="cna">${l.item.n}</div>
+        ${l.mods.length?`<div class="cmo">${l.mods.join(' · ')}</div>`:''}
+        <div class="cqw">
+          <button class="qb" onclick="chq('${l.uid}',-1)">−</button>
+          <span class="qn">${l.qty}</span>
+          <button class="qb" onclick="chq('${l.uid}',1)">+</button>
+        </div>
+      </div>
+      <div class="cpr">$${(l.price*l.qty).toFixed(2)}</div>
+    </div>`).join('');
+  const sub=cart.reduce((s,l)=>s+l.price*l.qty,0),tax=sub*.075,total=sub+tax;
+  document.getElementById('ctot').innerHTML=`
+    <div class="tr"><span>Subtotal</span><span>$${sub.toFixed(2)}</span></div>
+    <div class="tr"><span>Tax (7.5%)</span><span>$${tax.toFixed(2)}</span></div>
+    <div class="tr tot"><span>Total</span><span>$${total.toFixed(2)}</span></div>`;
+  rfbtn();
+}
+function chq(uid,d){
+  const i=cart.findIndex(l=>String(l.uid)===String(uid));
+  if(i<0)return;cart[i].qty+=d;if(cart[i].qty<=0)cart.splice(i,1);rCart();
+}
+function rfbtn(){
+  const n=document.getElementById('cname').value.trim();
+  const b=document.getElementById('obtn');if(b)b.disabled=!n||!cart.length;
+}
+
+/* ═══════════════════════════════════════════
+   PLACE ORDER
+═══════════════════════════════════════════ */
+function placeOrder(){
+  // Unlock audio on first user gesture that places an order
+  initAudio();
+  const name=document.getElementById('cname').value.trim();
+  const sub=cart.reduce((s,l)=>s+l.price*l.qty,0);tn++;
+  const o={id:Date.now(),ticket:tn,name,items:JSON.parse(JSON.stringify(cart)),total:sub*1.075,status:'new',placedAt:Date.now()};
+  orders.push(o);rev+=o.total;
+  document.getElementById('cfn').textContent='#'+tn;
+  document.getElementById('cfs').textContent=name+", we'll call you when it's ready!";
+  document.getElementById('cfov').classList.add('on');
+  cart=[];document.getElementById('cname').value='';rCart();badge();rBoard();
+  // Play new order sound immediately (audio was just unlocked by this gesture)
+  setTimeout(()=>playChime('new'),100);
+}
+function dcf(){document.getElementById('cfov').classList.remove('on');}
+
+/* ═══════════════════════════════════════════
+   STAFF — TICKET WITH RECIPE
+═══════════════════════════════════════════ */
+function rStaff(){
+  const nw=orders.filter(o=>o.status==='new');
+  const mk=orders.filter(o=>o.status==='making');
+  const rd=orders.filter(o=>o.status==='ready');
+
+  // Sound triggers
+  if(nw.length > prevNw) playChime('new');
+  if(rd.length > prevRd) playChime('ready');
+  prevNw=nw.length; prevRd=rd.length;
+
+  document.getElementById('cn').textContent=nw.length||'';
+  document.getElementById('cm').textContent=mk.length||'';
+  document.getElementById('cr').textContent=rd.length||'';
+  document.getElementById('sq').textContent=nw.length;
+  document.getElementById('sm').textContent=mk.length;
+  document.getElementById('sd').textContent=dn;
+  document.getElementById('sr').textContent='$'+Math.round(rev);
+  rCol('cnew',nw,'new');rCol('cmak',mk,'making');rCol('crdy',rd,'ready');badge();
+}
+
+function rCol(id,list,st){
+  const col=document.getElementById(id);
+  if(!list.length){col.innerHTML='<div class="kemp">Nothing here yet</div>';return;}
+  col.innerHTML=list.map(o=>tktH(o,st)).join('');
+}
+
+function tktH(o,st){
+  const sec=Math.floor((Date.now()-o.placedAt)/1000);
+  const mm=Math.floor(sec/60),ss=String(sec%60).padStart(2,'0');
+  const ts=mm>0?`${mm}m ${ss}s`:`${sec}s`;
+  const tc=sec>600?'r':sec>300?'w':'';
+  const act=st==='new'
+    ?`<button class="tb pr" onclick="mv(${o.id},'making')">▶ Start</button>`
+    :st==='making'
+    ?`<button class="tb pr" onclick="mv(${o.id},'ready')">✓ Mark Ready</button>`
+    :`<button class="tb dn" onclick="mv(${o.id},'done')">Collected</button>`;
+
+  const itemBlocks = o.items.map(l=>{
+    // Find current menu item to get recipe (may have been updated since order)
+    const menuItem = MENU.find(m=>m.id===l.item.id) || l.item;
+    const ings = menuItem.ingredients||[];
+    const steps = menuItem.steps||[];
+    const hasMods = l.mods && l.mods.length > 0;
+    const hasNote = l.note && l.note.trim();
+    const hasRecipe = ings.length > 0 || steps.length > 0;
+
+    return `<div class="tkt-item-block">
+      <div class="tkt-item-head">
+        <span class="tkt-item-ico">${l.item.e}</span>
+        <span class="tkt-item-name">${l.item.n}</span>
+        ${l.qty>1?`<span class="tkt-item-qty">×${l.qty}</span>`:''}
+      </div>
+      ${hasMods?`<div class="tkt-item-mods">${l.mods.map(m=>`<span>↪ ${m}</span>`).join('')}</div>`:''}
+      ${hasNote?`<div class="tktnote">⚠ ${l.note}</div>`:''}
+      ${hasRecipe?`<div class="tkt-recipe">
+        <div class="tkt-recipe-title">Build Recipe</div>
+        ${ings.length?`<div class="tkt-ingredients">${ings.map(i=>`<span class="tkt-ing-chip">${i}</span>`).join('')}</div>`:''}
+        ${steps.map((s,i)=>`<div class="tkt-step"><div class="tkt-step-num">${i+1}</div><div>${s}</div></div>`).join('')}
+      </div>`:''}
+    </div>`;
+  }).join('');
+
+  return`<div class="tkt${sec>600?' urg':''}${st==='new'?' new-flash':''}">
+    <div class="tkth">
+      <div><div class="tktnum">#${o.ticket}</div><div class="tktcu">${o.name}</div></div>
+      <div class="tkttm ${tc}">${ts}</div>
+    </div>
+    <div class="tktits">${itemBlocks}</div>
+    <div class="tktbs">${act}<button class="tlb" title="Print label" onclick="oLabel(${o.id})">🏷</button></div>
+  </div>`;
+}
+
+function mv(id,st){
+  const o=orders.find(x=>x.id===id);if(!o)return;
+  if(st==='done'){dn++;orders=orders.filter(x=>x.id!==id);}
+  else o.status=st;
+  rStaff();rBoard();
+}
+
+/* ═══════════════════════════════════════════
+   CUP LABELS
+═══════════════════════════════════════════ */
+function oLabel(oid){
+  const o=orders.find(x=>x.id===oid);if(!o)return;
+  const now=new Date().toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'});
+  document.getElementById('lbpv').innerHTML=o.items.map(l=>`
+    <div class="cup-label">
+      <div class="lbbr">Sweetwater Court</div>
+      <div class="lbdn">${l.item.e} ${l.item.n}</div>
+      <div class="lbcu">${o.name}</div>
+      ${l.mods.length?`<div class="lbmo">${l.mods.join(' · ')}</div>`:''}
+      <div class="lbft"><div class="lbnum">#${o.ticket}</div><div class="lbtm">${now}</div></div>
+    </div>`).join('');
+  olov('lov');
+}
+function doPrint(){
+  const h=document.getElementById('lbpv').innerHTML,pt=document.getElementById('prt');
+  pt.innerHTML=h;pt.style.display='block';window.print();
+  setTimeout(()=>{pt.style.display='none';pt.innerHTML=''},400);clov('lov');
+}
+
+/* ═══════════════════════════════════════════
+   BOARD
+═══════════════════════════════════════════ */
+function rBoard(){
+  const rd=orders.filter(o=>o.status==='ready');
+  const mk=orders.filter(o=>o.status==='making');
+  const tot=orders.filter(o=>o.status!=='done').length;
+  document.getElementById('brd').innerHTML=rd.length
+    ?rd.map(o=>`<div class="brc"><div class="brn">#${o.ticket}</div><div class="brnm">${o.name}</div></div>`).join('')
+    :'<div class="bnth">No orders ready yet</div>';
+  document.getElementById('bmk').innerHTML=mk.length
+    ?mk.map(o=>`<div class="bmp">#${o.ticket} · ${o.name}</div>`).join('')
+    :'<div class="bnth">All clear</div>';
+  const bw=document.getElementById('bwt');
+  if(tot>0){bw.style.display='';document.getElementById('bwv').textContent=Math.max(2,tot*2)+'–'+(Math.max(2,tot*2)+3)+' min';}
+  else bw.style.display='none';
+}
+
+/* ═══════════════════════════════════════════
+   MENU ADMIN
+═══════════════════════════════════════════ */
+function rAdmin(){
+  document.getElementById('alist').innerHTML = MENU.map(it=>`
+    <div class="aitem">
+      <div class="aitem-ico">${it.e}</div>
+      <div class="aitem-info">
+        <div class="aitem-name">${it.n}</div>
+        <div class="aitem-meta">
+          <span class="cat-badge${it.soldOut?' sold-badge':''}">${it.soldOut?'86\'d':it.cat}</span>
+          $${Number(it.p).toFixed(2)}
+          ${it.b?` · <em style="color:var(--ac);font-style:normal;font-size:11px">${it.b}</em>`:''}
+        </div>
+        ${(it.ingredients||[]).length>0?`<div class="aitem-recipe-preview">
+          📋 ${(it.ingredients||[]).length} ingredients · ${(it.steps||[]).length} steps
+        </div>`:''}
+      </div>
+      <div class="aitem-actions">
+        <button class="abtn sec" onclick="toggleSoldOut(${it.id})">${it.soldOut?'Restore':'86\'d'}</button>
+        <button class="abtn sec" onclick="openEditor(${it.id})">Edit</button>
+        <button class="abtn danger" onclick="deleteItem(${it.id})">✕</button>
+      </div>
+    </div>`).join('');
+}
+
+function toggleSoldOut(id){
+  const it=MENU.find(m=>m.id===id);if(!it)return;
+  it.soldOut=!it.soldOut;saveMenu();rAdmin();rMenu();
+}
+
+function deleteItem(id){
+  if(!confirm('Delete this item from the menu?'))return;
+  MENU=MENU.filter(m=>m.id!==id);saveMenu();rAdmin();rMenu();
+}
+
+/* ─── EDITOR MODAL ─── */
+let edId=null;
+
+function openEditor(id){
+  edId=id;
+  const it = id ? MENU.find(m=>m.id===id) : null;
+  const ings = it ? (it.ingredients||[]) : [''];
+  const steps = it ? (it.steps||[]) : [''];
+
+  document.getElementById('edmc').innerHTML=`
+    <div class="ed-title">${it?'Edit Item':'New Menu Item'}</div>
+    <div class="ed-grid">
+      <div>
+        <label class="field-label">Emoji</label>
+        <input class="field-input" id="ed-e" value="${it?it.e:'🍋'}" maxlength="4">
+      </div>
+      <div>
+        <label class="field-label">Category</label>
+        <select class="field-input" id="ed-cat">
+          ${['signature','seasonal','sparkling','wellness','addon'].map(c=>`<option value="${c}"${it&&it.cat===c?' selected':''}>${c[0].toUpperCase()+c.slice(1)}</option>`).join('')}
+        </select>
+      </div>
+      <div class="ed-full">
+        <label class="field-label">Item Name</label>
+        <input class="field-input" id="ed-n" value="${it?esc(it.n):''}" placeholder="e.g. Strawberry Fields">
+      </div>
+      <div class="ed-full">
+        <label class="field-label">Short Description (shown on menu)</label>
+        <input class="field-input" id="ed-d" value="${it?esc(it.d):''}" placeholder="e.g. Real strawberry purée, Meyer lemon, basil">
+      </div>
+      <div>
+        <label class="field-label">Price ($)</label>
+        <input class="field-input" id="ed-p" type="number" step="0.25" min="0" value="${it?it.p:'6.00'}">
+      </div>
+      <div>
+        <label class="field-label">Badge (optional)</label>
+        <input class="field-input" id="ed-b" value="${it&&it.b?it.b:''}" placeholder="e.g. New, Seasonal">
+      </div>
+    </div>
+
+    <div class="ed-section">
+      <div class="ed-section-title">
+        Ingredients
+        <button class="add-row-btn" style="width:auto;padding:4px 10px;font-size:11px" onclick="addIngRow()">+ Add</button>
+      </div>
+      <div id="ing-list">
+        ${ings.map((ing,i)=>ingRow(ing,i)).join('')}
+      </div>
+    </div>
+
+    <div class="ed-section">
+      <div class="ed-section-title">
+        Build Steps (shown on kitchen ticket)
+        <button class="add-row-btn" style="width:auto;padding:4px 10px;font-size:11px" onclick="addStepRow()">+ Add</button>
+      </div>
+      <div id="step-list">
+        ${steps.map((s,i)=>stepRow(s,i)).join('')}
+      </div>
+    </div>
+
+    <div class="ed-btns">
+      <button class="abtn sec" onclick="clov('edov')">Cancel</button>
+      <button class="abtn" onclick="saveItem()">Save Item</button>
+    </div>`;
+  olov('edov');
+}
+
+function ingRow(val,i){
+  return`<div class="ing-row" id="ing-${i}">
+    <input value="${esc(val)}" placeholder="e.g. 2 oz fresh lemon juice" oninput="">
+    <button class="rm-btn" onclick="rmRow('ing-${i}')">✕</button>
+  </div>`;
+}
+function stepRow(val,i){
+  return`<div class="step-row" id="step-${i}">
+    <div class="step-num-badge">${i+1}</div>
+    <textarea placeholder="e.g. Fill cup with ice to brim.">${esc(val)}</textarea>
+    <button class="rm-btn" onclick="rmRow('step-${i}')">✕</button>
+  </div>`;
+}
+
+function addIngRow(){
+  const list=document.getElementById('ing-list');
+  const i=list.children.length;
+  list.insertAdjacentHTML('beforeend',ingRow('',i));
+}
+function addStepRow(){
+  const list=document.getElementById('step-list');
+  const i=list.children.length;
+  list.insertAdjacentHTML('beforeend',stepRow('',i));
+  // re-number steps
+  [...list.querySelectorAll('.step-num-badge')].forEach((el,j)=>el.textContent=j+1);
+}
+function rmRow(id){
+  const el=document.getElementById(id);
+  if(el)el.remove();
+}
+
+function saveItem(){
+  const name = document.getElementById('ed-n').value.trim();
+  if(!name){alert('Please enter an item name.');return;}
+  const ingredients = [...document.querySelectorAll('#ing-list .ing-row input')].map(i=>i.value.trim()).filter(Boolean);
+  const steps = [...document.querySelectorAll('#step-list .step-row textarea')].map(t=>t.value.trim()).filter(Boolean);
+  const badge = document.getElementById('ed-b').value.trim();
+
+  if(edId){
+    const it=MENU.find(m=>m.id===edId);
+    if(it){
+      it.e=document.getElementById('ed-e').value.trim()||'🍋';
+      it.cat=document.getElementById('ed-cat').value;
+      it.n=name;
+      it.d=document.getElementById('ed-d').value.trim();
+      it.p=parseFloat(document.getElementById('ed-p').value)||0;
+      it.b=badge||undefined;
+      it.ingredients=ingredients;
+      it.steps=steps;
+    }
+  } else {
+    const newId=Date.now();
+    MENU.push({
+      id:newId,
+      cat:document.getElementById('ed-cat').value,
+      e:document.getElementById('ed-e').value.trim()||'🍋',
+      n:name,
+      d:document.getElementById('ed-d').value.trim(),
+      p:parseFloat(document.getElementById('ed-p').value)||0,
+      b:badge||undefined,
+      soldOut:false,
+      ingredients,
+      steps
+    });
+  }
+  saveMenu();clov('edov');rAdmin();rMenu();
+}
+
+function esc(s){ return s ? String(s).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;') : ''; }
+
+/* ═══════════════════════════════════════════
+   UTILS
+═══════════════════════════════════════════ */
+function badge(){document.getElementById('badge').textContent=orders.filter(o=>o.status!=='done').length;}
+function olov(id){document.getElementById(id).classList.add('on');}
+function clov(id){document.getElementById(id).classList.remove('on');}
+
+function go(v,btn){
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('on'));btn.classList.add('on');
+  document.getElementById('pk').style.display='none';document.getElementById('pk').classList.remove('on');
+  ['ps','pb','pa'].forEach(id=>document.getElementById(id).classList.remove('on'));
+  if(v==='k'){document.getElementById('pk').style.display='grid';document.getElementById('pk').classList.add('on');}
+  else document.getElementById('p'+v).classList.add('on');
+  if(v==='s'){rStaff();}
+  if(v==='b'){rBoard();}
+  if(v==='a'){rAdmin();}
+  // Unlock audio on any tab click (user gesture)
+  initAudio();
+}
+
+function tick(){
+  const n=new Date();
+  const c=document.getElementById('sclk'),d=document.getElementById('sdt');
+  if(c)c.textContent=n.toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'});
+  if(d)d.textContent=n.toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'});
+}
+
+// Auto-refresh staff view timers
+setInterval(()=>{if(document.getElementById('ps').classList.contains('on'))rStaff();},6000);
+setInterval(tick,1000);
+
+/* INIT */
+rMenu();tick();
+// Show sound unlock banner by default — will be dismissed on first interaction
+setTimeout(()=>{
+  if(!audioUnlocked) document.getElementById('snd-banner').classList.add('show');
+},1500);
+</script>
+</body>
+</html>
